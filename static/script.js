@@ -144,7 +144,7 @@ async function handleFile(file) {
         // Setup View Text
         viewTextBtn.onclick = async () => {
             try {
-                const textResp = await fetch(`/text/${clientId}`);
+                const textResp = await fetch(`/text/${clientId}?t=${Date.now()}`);
                 if (!textResp.ok) throw new Error("Could not fetch text");
                 const textMap = await textResp.json();
                 
