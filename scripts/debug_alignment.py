@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+"""
+Debug script to visualize alignment between Surya boxes and LLM text.
+"""
 
 import fitz
 import base64
@@ -5,10 +9,16 @@ import argparse
 import sys
 import io
 import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from PIL import Image, ImageDraw, ImageFont
-from pdf_utils import PDFHandler
-from ocr import OCRProcessor
-from hybrid_aligner import HybridAligner
+from src.pdf_ocr.core.pdf import PDFHandler
+from src.pdf_ocr.core.ocr import OCRProcessor
+from src.pdf_ocr.core.aligner import HybridAligner
+import asyncio
+
 
 def debug_alignment(pdf_path):
     print(f"Debug Alignment for: {pdf_path}")
@@ -44,7 +54,7 @@ def debug_alignment(pdf_path):
     
     # 4. LLM OCR
     print("Running LLM OCR...")
-    llm_lines = ocr_processor.perform_ocr(image_base64)
+    llm_lines = asyncio.run(ocr_processor.perform_ocr(image_base64))
     print(f"LLM found {len(llm_lines)} lines.")
     
     # 5. Align
@@ -86,6 +96,7 @@ def debug_alignment(pdf_path):
     output_filename = f"debug_align_{os.path.basename(pdf_path)}.png"
     img.save(output_filename)
     print(f"Saved debug image to {output_filename}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

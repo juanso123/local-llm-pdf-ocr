@@ -134,15 +134,51 @@ uv run main.py input.pdf output_ocr.pdf
 
 **Options**:
 
--   `-v`, `--verbose`: Enable debug logging (shows alignment details, box counts, etc.)
+| Option             | Description                                                  |
+| ------------------ | ------------------------------------------------------------ |
+| `input_pdf`        | Path to input PDF (required)                                 |
+| `output_pdf`       | Path to output PDF (optional, defaults to `<input>_ocr.pdf`) |
+| `-v`, `--verbose`  | Enable debug logging (alignment details, box counts)         |
+| `-q`, `--quiet`    | Suppress all output except errors                            |
+| `--dpi <int>`      | DPI for image rendering (default: 200)                       |
+| `--pages <range>`  | Page range to process, e.g., `1-3,5` (default: all)          |
+| `--api-base <url>` | Override LLM API base URL                                    |
+| `--model <name>`   | Override LLM model name                                      |
 
-**Example**:
+**Examples**:
 
 ```bash
-uv run main.py contract_scan.pdf contract_searchable.pdf -v
+# Basic usage (auto-generates input_ocr.pdf)
+uv run main.py scan.pdf
+
+# Process specific pages with higher quality
+uv run main.py document.pdf output.pdf --pages 1-5 --dpi 300
+
+# Use a different model with verbose output
+uv run main.py report.pdf --model "custom-model" --verbose
 ```
 
 _You'll see beautiful animated progress bars showing batch detection and per-page LLM processing._
+
+---
+
+## 📁 Project Structure
+
+```
+local-llm-pdf-ocr/
+├── src/pdf_ocr/           # Core package
+│   ├── core/              # OCR processing modules
+│   │   ├── aligner.py     # Hybrid text alignment
+│   │   ├── ocr.py         # LLM OCR processor
+│   │   └── pdf.py         # PDF handling utilities
+│   └── utils/             # Utility modules
+│       └── tqdm_patch.py  # Progress bar silencer
+├── scripts/               # Debug and visualization tools
+├── static/                # Web UI assets
+├── examples/              # Sample PDFs
+├── main.py                # CLI entry point
+└── server.py              # Web server
+```
 
 ---
 

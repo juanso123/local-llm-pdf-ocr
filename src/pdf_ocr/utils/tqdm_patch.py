@@ -1,5 +1,12 @@
+"""
+TQDM Patch - Silences progress bars to prevent collision with Rich.
+
+Provides a dummy tqdm implementation that silently passes through iterables
+without displaying progress bars.
+"""
 
 import tqdm
+
 
 class SilentTqdm:
     """
@@ -29,6 +36,7 @@ class SilentTqdm:
         
     def __exit__(self, *args):
         pass
+
 
 def apply():
     """

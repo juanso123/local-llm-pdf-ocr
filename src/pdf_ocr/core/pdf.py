@@ -1,19 +1,39 @@
+"""
+PDFHandler - PDF processing utilities.
+
+Handles PDF to image conversion and text embedding for creating searchable PDFs.
+"""
+
 import fitz  # PyMuPDF
 from PIL import Image
 import io
 import base64
 
+
 class PDFHandler:
+    """
+    PDF processing handler for OCR workflows.
+    
+    Handles:
+    - Converting PDF pages to images
+    - Embedding invisible text layers for searchability
+    - Creating "sandwich" PDFs with image background and text overlay
+    """
+    
     def __init__(self):
         pass
 
-    def pdf_to_base64_images(self, pdf_path):
+    def pdf_to_base64_images(self, pdf_path, dpi: int = 150):
         """
         Yields (page_number, base64_image_string, page_width, page_height) for each page in the PDF.
+        
+        Args:
+            pdf_path: Path to the PDF file
+            dpi: Resolution for rendering (default: 150)
         """
         doc = fitz.open(pdf_path)
         for page_num, page in enumerate(doc):
-            pix = page.get_pixmap(dpi=150)
+            pix = page.get_pixmap(dpi=dpi)
             img_data = pix.tobytes("jpg", jpg_quality=50)
             # Resize to max 1024x1024 to ensure it fits in context window
             img = Image.open(io.BytesIO(img_data))
@@ -26,12 +46,16 @@ class PDFHandler:
             yield page_num, base64_img, page.rect.width, page.rect.height
         doc.close()
 
-    def convert_to_images(self, pdf_path):
+    def convert_to_images(self, pdf_path, dpi: int = 150):
         """
         Returns a dict of {page_num: base64_image} for all pages.
+        
+        Args:
+            pdf_path: Path to the PDF file
+            dpi: Resolution for rendering (default: 150)
         """
         images = {}
-        for page_num, img, _, _ in self.pdf_to_base64_images(pdf_path):
+        for page_num, img, _, _ in self.pdf_to_base64_images(pdf_path, dpi=dpi):
             images[page_num] = img
         return images
 
@@ -99,11 +123,16 @@ class PDFHandler:
         doc.close()
 
 
-    def embed_structured_text(self, input_pdf_path, output_pdf_path, pages_data):
+    def embed_structured_text(self, input_pdf_path, output_pdf_path, pages_data, dpi: int = 200):
         """
         Embeds structured text (box, text) into the PDF.
         Replaces page content with image, then overlays boxes.
-        pages_data: dict {page_num: [([x0,y0,x1,y1], text), ...]}
+        
+        Args:
+            input_pdf_path: Path to input PDF
+            output_pdf_path: Path to output PDF
+            pages_data: dict {page_num: [([x0,y0,x1,y1], text), ...]}
+            dpi: Resolution for rendering (default: 200)
         """
         doc = fitz.open(input_pdf_path)
         new_doc = fitz.open()
@@ -114,7 +143,7 @@ class PDFHandler:
             height = old_page.rect.height
             
             # Render image of original page
-            pix = old_page.get_pixmap(dpi=200)
+            pix = old_page.get_pixmap(dpi=dpi)
             img_data = pix.tobytes("jpg", jpg_quality=80)
             
             # Create new page in new doc
@@ -214,5 +243,3 @@ class PDFHandler:
         new_doc.save(output_pdf_path)
         new_doc.close()
         doc.close()
-
-

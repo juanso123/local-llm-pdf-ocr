@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Debug script to test Surya's DetectionPredictor ONLY (no recognition).
 This approach gives us bounding boxes without the expensive recognition model.
@@ -5,11 +6,17 @@ This approach gives us bounding boxes without the expensive recognition model.
 The idea: Since LLM provides high-quality text, we only need boxes from Surya.
 Alignment becomes position-based rather than anchor-based.
 """
+
 import fitz
 from PIL import Image, ImageDraw, ImageFont
 import io
 import os
+import sys
 import time
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 def get_detection_only_boxes(image_bytes):
     """Get bounding boxes using ONLY Surya's DetectionPredictor (no recognition)."""
@@ -86,7 +93,7 @@ def visualize_detection_boxes(img, boxes, color, label):
 
 def test_detection(pdf_filename):
     """Test detection-only on a PDF file."""
-    input_path = os.path.join("examples", pdf_filename)
+    input_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "examples", pdf_filename)
     if not os.path.exists(input_path):
         print(f"File not found: {input_path}")
         return
@@ -120,8 +127,6 @@ def test_detection(pdf_filename):
 
 
 if __name__ == "__main__":
-    import sys
-    
     if len(sys.argv) > 1:
         test_detection(sys.argv[1])
     else:

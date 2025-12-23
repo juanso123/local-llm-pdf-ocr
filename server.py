@@ -8,9 +8,9 @@ import uuid
 import json
 import asyncio
 from pathlib import Path
-from pdf_utils import PDFHandler
-from ocr import OCRProcessor
-from hybrid_aligner import HybridAligner
+from src.pdf_ocr.core.pdf import PDFHandler
+from src.pdf_ocr.core.ocr import OCRProcessor
+from src.pdf_ocr.core.aligner import HybridAligner
 import tempfile
 import base64
 

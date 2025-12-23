@@ -1,12 +1,23 @@
+#!/usr/bin/env python3
+"""
+Visualize bounding boxes detected by HybridAligner.
+"""
 
 import fitz
 from PIL import Image, ImageDraw
 import io
 import os
-from hybrid_aligner import HybridAligner
+import sys
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.pdf_ocr.core.aligner import HybridAligner
+
 
 def visualize_boxes(pdf_filename):
-    input_path = os.path.join("examples", pdf_filename)
+    examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "examples")
+    input_path = os.path.join(examples_dir, pdf_filename)
     if not os.path.exists(input_path):
         print(f"File not found: {input_path}")
         return
@@ -48,7 +59,11 @@ def visualize_boxes(pdf_filename):
     img.save(output_filename)
     print(f"  Saved visualization to {output_filename}")
 
+
 if __name__ == "__main__":
-    visualize_boxes("digital.pdf")
-    visualize_boxes("hybrid.pdf")
-    visualize_boxes("handwritten.pdf")
+    if len(sys.argv) > 1:
+        visualize_boxes(sys.argv[1])
+    else:
+        visualize_boxes("digital.pdf")
+        visualize_boxes("hybrid.pdf")
+        visualize_boxes("handwritten.pdf")

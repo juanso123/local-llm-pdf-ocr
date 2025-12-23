@@ -1,5 +1,15 @@
+#!/usr/bin/env python3
+"""
+Verify that OCR output PDF contains searchable text.
+"""
+
 import fitz
 import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 
 def verify(pdf_path):
     print(f"Verifying '{pdf_path}'...")
@@ -61,6 +71,9 @@ def verify(pdf_path):
         print(f"Error reading PDF: {e}")
         sys.exit(1)
 
-if __name__ == "__main__":
-    verify("output_ocr.pdf")
 
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        verify(sys.argv[1])
+    else:
+        verify("output_ocr.pdf")

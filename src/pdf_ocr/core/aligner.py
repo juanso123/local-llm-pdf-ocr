@@ -1,13 +1,21 @@
+"""
+HybridAligner - Detection-Only OCR Aligner.
+
+Uses Surya's DetectionPredictor (fast) for bounding boxes,
+then distributes LLM text across boxes using position-based alignment.
+"""
+
 import io
 import sys
 import logging
 
-import tqdm_patch
+from src.pdf_ocr.utils import tqdm_patch
 # Silence Surya's progress bars to prevent collision with Rich
 tqdm_patch.apply()
 
 from PIL import Image
 from surya.detection import DetectionPredictor
+
 
 class HybridAligner:
     """

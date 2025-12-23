@@ -1,12 +1,22 @@
+#!/usr/bin/env python3
+"""
+Test script to check HybridAligner output format.
+"""
 
 import fitz
 from PIL import Image
 import sys
-from hybrid_aligner import HybridAligner
 import os
 
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.pdf_ocr.core.aligner import HybridAligner
+
+
 def check_file(filename):
-    path = os.path.join("examples", filename)
+    examples_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "examples")
+    path = os.path.join(examples_dir, filename)
     if not os.path.exists(path):
         print(f"Skipping {path} (not found)")
         return
@@ -41,6 +51,7 @@ def check_file(filename):
              
     except Exception as e:
         print(f"  Status: ERROR ({e})")
+
 
 if __name__ == "__main__":
     check_file("digital.pdf")

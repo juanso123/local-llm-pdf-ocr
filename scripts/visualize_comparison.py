@@ -1,15 +1,26 @@
+#!/usr/bin/env python3
+"""
+Generate side-by-side comparison of raw Surya boxes vs aligned output.
+"""
+
 import argparse
 import asyncio
 import logging
 import fitz
 from PIL import Image, ImageDraw, ImageFont
 import io
-from ocr import OCRProcessor
-from hybrid_aligner import HybridAligner
+import os
 import sys
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.pdf_ocr.core.ocr import OCRProcessor
+from src.pdf_ocr.core.aligner import HybridAligner
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+
 
 async def generate_comparison(pdf_path, output_path):
     print(f"Processing {pdf_path}...")
@@ -49,15 +60,7 @@ async def generate_comparison(pdf_path, output_path):
         # Processor expects base64 string
         b64_img = base64.b64encode(jpeg_bytes).decode('utf-8')
         
-        # We assume ocr.py can handle base64 of JPEG if we fix the header or if it's generic
-        # ocr.py has f"data:image/png;base64,{image_base64}"
-        # We are sending JPEG bytes as base64.
-        # This MISMATCH (header says png, data is jpeg) might be okay for some LLMs or might fail.
-        # Ideally we should fix ocr.py to be dynamic or send PNG.
-        # But wait, in Step 1373 it succeded with JPEG bytes.
-        # So I will trust it works.
-        
-        llm_text_lines = await asyncio.to_thread(processor.perform_ocr, b64_img)
+        llm_text_lines = await processor.perform_ocr(b64_img)
         print(f"LLM Response: {len(llm_text_lines)} lines found.")
     except Exception as e:
         print(f"LLM Failed: {e}. Using dummy text for visualization if needed, but alignment will fail.")
@@ -111,6 +114,7 @@ async def generate_comparison(pdf_path, output_path):
     
     comparison_img.save(output_path)
     print(f"Comparison saved to {output_path}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
